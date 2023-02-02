@@ -6,7 +6,7 @@
 */
 
 // Program Output:
-// Drive forward only when button is pressed
+// Toggle drive forward and stop with button press
 
 // Definitions Arduino pins connected to input H Bridge
 int IN1 = 4;
@@ -22,6 +22,9 @@ int FORWARD = 1;
 int STOP = 0;
 int BACKWARD = -1;
 
+// Current moving direction
+int DIRECTION = STOP;
+
 void setup()
 {
     // Set the output pins
@@ -31,53 +34,17 @@ void setup()
     pinMode(IN4, OUTPUT);
 
     resetPins();
-
-    // NOTE: The white turning wheel is the "front" of the tractor
-    // Therefore, motor A is the left wheel, motor B is the right wheel
-
-    // NOTE: "Clockwise" is from the point of view of the center of the tractor
-    // That means that "clockwise" is forward for A, but backwards for B
-
-    /*
-    // Turn Motor A Clockwise (Forward)
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
-
-    // Turn Motor B Counterclockwise (Forward)
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, HIGH);
-
-    // Delay
-    delay(DELAY);  // Drive forward
-    resetPins();
-    delay(DELAY);  // Stop and wait
-
-    // Turn Motor A Counterclockwise (Backward)
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, HIGH);
-
-    // Turn Motor B Clockwise (Backward)
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
-
-    // Delay, then quit
-    delay(DELAY);  // Drive backward
-    resetPins();
-    exit(0);
-    */
 }
 
 void loop()
 {
   // Drive forward when button is pressed, otherwise stop
   PUSHBUTTON = digitalRead(PUSHBUTTON_PIN); // Grab HIGH or LOW from button
+
   if (PUSHBUTTON == HIGH) {
-    motorA(FORWARD);
-    motorB(FORWARD);
-  }
-  else {
-    motorA(STOP);
-    motorB(STOP);
+    DIRECTION = !DIRECTION;  // Toggle 0 to 1 or 1 to 0;
+    motorA(DIRECTION);
+    motorB(DIRECTION);
   }
 }
 
