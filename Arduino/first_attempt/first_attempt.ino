@@ -13,6 +13,8 @@ int IN1 = 4;
 int IN2 = 5;
 int IN3 = 6;
 int IN4 = 7;
+int ENA = 9;
+int ENB = 10;
 int DELAY = 500; // ms
 int PUSHBUTTON_PIN = 3;
 int PUSHBUTTON = 0;
@@ -32,12 +34,16 @@ void setup()
     pinMode(IN2, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
+    pinMode(ENA, OUTPUT);
+    pinMode(ENB, OUTPUT);
 
     resetPins();
 }
 
 void loop()
 {
+  analogWrite(ENA, 50);  // ONLY between 0, 255 but recommeneded 50 to 255
+  analogWrite(ENB, 255);
   // Drive forward when button is pressed, otherwise stop
   PUSHBUTTON = digitalRead(PUSHBUTTON_PIN); // Grab HIGH or LOW from button
 
