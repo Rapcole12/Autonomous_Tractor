@@ -19,7 +19,7 @@ int IN4 = 7;
 int RX_PIN = 9;
 int TX_PIN = 8;
 
-SoftwareSerial BLESerial(RX_PIN, TX_PIN);
+SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
 
 enum direction {
     STOP,
@@ -30,8 +30,8 @@ enum direction {
 // Current moving direction
 direction DIRECTION = STOP;
 
-String messageBuffer = "";
-String message = "";
+String temp_message = ""; // this will extract each character and concatenate previous characters from the phone
+String message = ""; //this will be the actual message that will determine wehther the motor turns on or off
 
 void setup()
 {
@@ -47,26 +47,41 @@ void setup()
   BLESerial.begin(9600);
 }
 
-void loop()
-{
+void loop(){
+
+  //This while loop ensures that we are connected to the BLESerial
   while (BLESerial.available() > 0) {
-    char next = (char) BLESerial.read();
-    messageBuffer += next;
-    if (next == ';') {
-      message = messageBuffer;
-      messageBuffer = "";
+      
+    char next_char = (char) BLESerial.read(); //reads each character because the .read function can read one character at a time
+    temp_message += next_char; //concatenates all characters put in terminal from phone
+
+    if (next_char == '\n') {
+
+      message = temp_message;
+      temp_message = ""; //resets temp_message in terminal
       Serial.print(message);
-      message.trim();
-      if (message == "on;") {
+      message.trim(); // takes away the new line character
+      message.toUpperCase(); //ensures that message is case-insensitive
+
+      if (message == "ON") {
         motorA(FORWARD);
         motorB(FORWARD);
       }
-      else if (message == "off;") {
+
+      else if (message == "OFF") {
         motorA(STOP);
         motorB(STOP);
       }
+
+      else {
+       message =  message + " is not a valid expression \n";
+       BLESerial.print(message);
+      }
+
     }
+
   }
+
 }
 
 void motorA(direction status) {
