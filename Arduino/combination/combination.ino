@@ -11,6 +11,16 @@
 #include "Arduino.h"
 #include <SoftwareSerial.h>
 
+#include "Wire.h"
+#include <MPU6050_light.h>
+
+MPU6050 mpu(Wire);
+unsigned long timer = 0;
+float angleX = 0;
+float angleY = 0;
+float angleZ = 0;
+float toleranceAngle = 3.0;
+
 // Definitions Arduino Pins
 int IN1 = 4;
 int IN2 = 5;
@@ -32,6 +42,7 @@ direction DIRECTION = STOP;
 
 String temp_message = ""; // this will extract each character and concatenate previous characters from the phone
 String message = ""; //this will be the actual message that will determine wehther the motor turns on or off
+bool running = false;
 
 void setup()
 {
@@ -43,12 +54,23 @@ void setup()
   pinMode(RX_PIN, INPUT);
   pinMode(TX_PIN, OUTPUT);
 
-  Serial.begin(9600);
-  BLESerial.begin(9600);
+  Serial.begin(9600);  // Serial Monitor
+  BLESerial.begin(9600);  // Bluetooth Terminal
+  Wire.begin(); // Gyroscope
+  byte status = mpu.begin();
+  
+  // Zero out the gyro
+  while (status != 0) {
+    Serial.println("Could not connect to gyroscope");
+  }
+
+  Serial.println("About to zero gyroscope, DO NOT MOVE");
+  delay(1000);
+  mpu.calcOffsets(); // Calculate the zeros
+  Serial.println("Ready to use!");
 }
 
-void loop(){
-
+void loop() {
   //This while loop ensures that we are connected to the BLESerial
   while (BLESerial.available() > 0) {
       
@@ -64,24 +86,53 @@ void loop(){
       message.toUpperCase(); //ensures that message is case-insensitive
 
       if (message == "ON") {
-        motorA(FORWARD);
-        motorB(FORWARD);
+        running = true;
       }
-
       else if (message == "OFF") {
-        motorA(STOP);
-        motorB(STOP);
+        running = false;
       }
-
       else {
        message =  message + " is not a valid expression \n";
        BLESerial.print(message);
       }
-
     }
-
   }
 
+  mpu.update();
+
+  if((millis()-timer)>10){ // print data every 10ms
+	  angleX = mpu.getAngleX();
+    angleY = mpu.getAngleY();
+    angleZ = mpu.getAngleZ();
+	  timer = millis();  
+  }
+
+  // TEMP BECAUSE NO CONNECTED BLE
+  running = true;
+
+  Serial.println(angleZ);
+
+  if (running) {
+    if (angleZ < -toleranceAngle) {
+      motorA(STOP);
+      motorB(FORWARD);
+      Serial.println("Turning too far to the right");
+    }
+    else if (angleZ > toleranceAngle) {
+      motorA(FORWARD);
+      motorB(STOP);
+      Serial.println("Turning too far to the left");
+    }
+    else {
+      motorA(FORWARD);
+      motorB(FORWARD);
+      Serial.println("Continue moving forward");
+    }
+  }
+  else {
+    motorA(STOP);
+    motorB(STOP);
+  }
 }
 
 void motorA(direction status) {
