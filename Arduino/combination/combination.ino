@@ -19,7 +19,7 @@ unsigned long timer = 0;
 float angleX = 0;
 float angleY = 0;
 float angleZ = 0;
-float toleranceAngle = 3.0;
+float toleranceAngle = 1.0;
 
 // Definitions Arduino Pins
 int IN1 = 4;
@@ -28,6 +28,10 @@ int IN3 = 6;
 int IN4 = 7;
 int RX_PIN = 9;
 int TX_PIN = 8;
+int ENA = 10;
+int ENB = 11;
+int MAX_SPEED = 255; 
+int SLOW_SPEED = 100;
 
 SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
 
@@ -53,6 +57,8 @@ void setup()
   pinMode(IN4, OUTPUT);
   pinMode(RX_PIN, INPUT);
   pinMode(TX_PIN, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
 
   Serial.begin(9600);  // Serial Monitor
   BLESerial.begin(9600);  // Bluetooth Terminal
@@ -64,9 +70,11 @@ void setup()
     Serial.println("Could not connect to gyroscope");
   }
 
+  BLESerial.println("About to zero gyroscope, DO NOT MOVE");
   Serial.println("About to zero gyroscope, DO NOT MOVE");
   delay(1000);
   mpu.calcOffsets(); // Calculate the zeros
+  BLESerial.println("Ready to use!");
   Serial.println("Ready to use!");
 }
 
@@ -87,9 +95,11 @@ void loop() {
 
       if (message == "ON") {
         running = true;
+        BLESerial.print("Turned ON\n");
       }
       else if (message == "OFF") {
         running = false;
+        BLESerial.print("Turned OFF\n");
       }
       else {
        message =  message + " is not a valid expression \n";
@@ -107,25 +117,28 @@ void loop() {
 	  timer = millis();  
   }
 
-  // TEMP BECAUSE NO CONNECTED BLE
-  running = true;
-
-  Serial.println(angleZ);
+  // Serial.println(angleZ);
 
   if (running) {
     if (angleZ < -toleranceAngle) {
-      motorA(STOP);
+      motorA(FORWARD);
+      analogWrite(ENA, SLOW_SPEED);
       motorB(FORWARD);
+      analogWrite(ENB, MAX_SPEED);
       Serial.println("Turning too far to the right");
     }
     else if (angleZ > toleranceAngle) {
       motorA(FORWARD);
-      motorB(STOP);
+      analogWrite(ENA, MAX_SPEED);
+      motorB(FORWARD);
+      analogWrite(ENB, SLOW_SPEED);
       Serial.println("Turning too far to the left");
     }
     else {
       motorA(FORWARD);
+      analogWrite(ENA, MAX_SPEED);
       motorB(FORWARD);
+      analogWrite(ENB, MAX_SPEED);
       Serial.println("Continue moving forward");
     }
   }
