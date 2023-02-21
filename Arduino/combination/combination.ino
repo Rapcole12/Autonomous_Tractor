@@ -33,6 +33,7 @@ int ENB = 11;
 int MAX_SPEED = 255; 
 int SLOW_SPEED = 100;
 int STOP_SPEED = 0;
+int PUSHBUTTON_PIN = 13;
 
 SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
 
@@ -148,7 +149,7 @@ void SetPins(){
   pinMode(TX_PIN, OUTPUT);
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
-
+  pinMode(PUSHBUTTON_PIN, INPUT);
 }
 
 void BLESetup(){
@@ -186,11 +187,17 @@ void BLESetup(){
 
 void SetTimer(){
 
-  if((millis()-timer)>10){ // print data every 10ms
+  if((millis()-timer)>10) {
 	
     angleX = mpu.getAngleX();
     angleY = mpu.getAngleY();
     angleZ = mpu.getAngleZ();
+
+    if(digitalRead(PUSHBUTTON_PIN) == HIGH) {
+      running = !running;
+      delay(250);
+    }
+
 	  timer = millis();  
   }
 
