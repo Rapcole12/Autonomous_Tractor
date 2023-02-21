@@ -32,6 +32,7 @@ int ENA = 10;
 int ENB = 11;
 int MAX_SPEED = 255; 
 int SLOW_SPEED = 100;
+int STOP_SPEED = 0;
 
 SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
 
@@ -50,15 +51,8 @@ bool running = false;
 
 void setup()
 {
-  // Set the output pins
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
-  pinMode(RX_PIN, INPUT);
-  pinMode(TX_PIN, OUTPUT);
-  pinMode(ENA, OUTPUT);
-  pinMode(ENB, OUTPUT);
+ 
+ SetPins();
 
   Serial.begin(9600);  // Serial Monitor
   BLESerial.begin(9600);  // Bluetooth Terminal
@@ -79,7 +73,86 @@ void setup()
 }
 
 void loop() {
-  //This while loop ensures that we are connected to the BLESerial
+  
+  BLESetup();
+
+  mpu.update();
+
+  SetTimer();
+
+  if (running) {
+    KeepStraight();
+  }
+  else {
+    motorA(STOP, STOP_SPEED);
+    motorB(STOP, STOP_SPEED);
+  }
+}
+
+void motorA(direction status, int speed) {
+  if (status == STOP) {
+    analogWrite(ENA, speed);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+  }
+  else if (status == FORWARD) {
+    // Turn Motor A Clockwise (Forward)
+    analogWrite(ENA, speed);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+  }
+  else if (status == BACKWARD) {
+    // Turn Motor A Counterclockwise (Backward)
+    analogWrite(ENA, speed);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+  }
+  else {
+    return;
+  }
+  
+}
+
+void motorB(direction status, int speed) {
+  if (status == STOP) {
+    analogWrite(ENB, speed);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+  }
+  else if (status == FORWARD) {
+    // Turn Motor B Counterclockwise (Forward)
+    analogWrite(ENB, speed);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+
+  }
+  else if (status == BACKWARD) {
+    // Turn Motor B Clockwise (Backward)
+    analogWrite(ENB, speed);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+  }
+  else {
+    return;
+  }
+  
+}
+
+void SetPins(){
+ // Set the output pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(RX_PIN, INPUT);
+  pinMode(TX_PIN, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+}
+
+void BLESetup(){
+ //This while loop ensures that we are connected to the BLESerial
   while (BLESerial.available() > 0) {
       
     char next_char = (char) BLESerial.read(); //reads each character because the .read function can read one character at a time
@@ -106,84 +179,39 @@ void loop() {
        BLESerial.print(message);
       }
     }
+
   }
 
-  mpu.update();
+}
+
+void SetTimer(){
 
   if((millis()-timer)>10){ // print data every 10ms
-	  angleX = mpu.getAngleX();
+	
+    angleX = mpu.getAngleX();
     angleY = mpu.getAngleY();
     angleZ = mpu.getAngleZ();
 	  timer = millis();  
   }
 
-  // Serial.println(angleZ);
-
-  if (running) {
-    if (angleZ < -toleranceAngle) {
-      motorA(FORWARD);
-      analogWrite(ENA, SLOW_SPEED);
-      motorB(FORWARD);
-      analogWrite(ENB, MAX_SPEED);
-      Serial.println("Turning too far to the right");
-    }
-    else if (angleZ > toleranceAngle) {
-      motorA(FORWARD);
-      analogWrite(ENA, MAX_SPEED);
-      motorB(FORWARD);
-      analogWrite(ENB, SLOW_SPEED);
-      Serial.println("Turning too far to the left");
-    }
-    else {
-      motorA(FORWARD);
-      analogWrite(ENA, MAX_SPEED);
-      motorB(FORWARD);
-      analogWrite(ENB, MAX_SPEED);
-      Serial.println("Continue moving forward");
-    }
-  }
-  else {
-    motorA(STOP);
-    motorB(STOP);
-  }
 }
 
-void motorA(direction status) {
-  if (status == STOP) {
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-  }
-  else if (status == FORWARD) {
-    // Turn Motor A Clockwise (Forward)
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
-  }
-  else if (status == BACKWARD) {
-    // Turn Motor A Counterclockwise (Backward)
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, HIGH);
-  }
-  else {
-    return;
-  }
-}
+void KeepStraight(){
 
-void motorB(direction status) {
-  if (status == STOP) {
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
+  if (angleZ < -toleranceAngle) {
+    motorA(FORWARD, SLOW_SPEED);
+    motorB(FORWARD, MAX_SPEED);
+    Serial.println("Turning too far to the right");
   }
-  else if (status == FORWARD) {
-    // Turn Motor B Counterclockwise (Forward)
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, HIGH);
-  }
-  else if (status == BACKWARD) {
-    // Turn Motor B Clockwise (Backward)
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
+  else if (angleZ > toleranceAngle) {
+    motorA(FORWARD, MAX_SPEED);
+    motorB(FORWARD, SLOW_SPEED);
+    Serial.println("Turning too far to the left");
   }
   else {
-    return;
+    motorA(FORWARD, MAX_SPEED);
+    motorB(FORWARD, MAX_SPEED);
+    Serial.println("Continue moving forward");
   }
+
 }
