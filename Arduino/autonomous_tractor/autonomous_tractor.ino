@@ -1,25 +1,30 @@
-/*==========================================================================
-// Authors: Richard Martinez and Raphael Rodriguez
-// Project: ECE 2804 Autonomous Tractor
-// Description: Arduino script to control the motors using L298N motor driver
-//==========================================================================
+/*
+==========================================================================
+Authors: Richard Martinez and Raphael Rodriguez
+Project: ECE 2804 Autonomous Tractor
+Description: Arduino script implementing a self-driving tractor
+Included Features: L298N Motor Driver, HM-10 BLE Module, MPU-9250 Gyroscope
+==========================================================================
 */
 
-// Program Output:
-// Toggle drive forward and stop with bluetooth command
-
+// Includes for BLE
 #include "Arduino.h"
 #include <SoftwareSerial.h>
 
+// Includes for Gyroscope
 #include "Wire.h"
 #include <MPU6050_light.h>
 
+// Init Gyroscope
 MPU6050 mpu(Wire);
 unsigned long timer = 0;
 float angleX = 0;
 float angleY = 0;
 float angleZ = 0;
 float toleranceAngle = 1.0;
+int MAX_SPEED = 255; 
+int SLOW_SPEED = 100;
+int STOP_SPEED = 0;
 
 // Definitions Arduino Pins
 int IN1 = 4;
@@ -30,13 +35,12 @@ int RX_PIN = 9;
 int TX_PIN = 8;
 int ENA = 10;
 int ENB = 11;
-int MAX_SPEED = 255; 
-int SLOW_SPEED = 100;
-int STOP_SPEED = 0;
 int PUSHBUTTON_PIN = 13;
 
+// Init BLE
 SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
 
+// Enum to control direction of the tractor
 enum direction {
     STOP,
     FORWARD,
@@ -48,23 +52,27 @@ direction DIRECTION = STOP;
 
 String temp_message = ""; // this will extract each character and concatenate previous characters from the phone
 String message = ""; //this will be the actual message that will determine wehther the motor turns on or off
+
+// Is the tractor running?
 bool running = false;
 
 void setup()
 {
- 
- SetPins();
+  // Init Pins as INPUT or OUTPUT
+  SetPins();
 
+  // Init Serial Monitor, BLE, and Gyro
   Serial.begin(9600);  // Serial Monitor
   BLESerial.begin(9600);  // Bluetooth Terminal
   Wire.begin(); // Gyroscope
   byte status = mpu.begin();
   
-  // Zero out the gyro
+  // Stop if gyro can't connect
   while (status != 0) {
     Serial.println("Could not connect to gyroscope");
   }
 
+  // Zero out the gyro
   BLESerial.println("About to zero gyroscope, DO NOT MOVE");
   Serial.println("About to zero gyroscope, DO NOT MOVE");
   delay(1000);
@@ -74,13 +82,16 @@ void setup()
 }
 
 void loop() {
-  
+  // Parse and Handle BLE
   BLESetup();
 
+  // Update gyro data
   mpu.update();
 
+  // Grab gyro data and check pushbutton every 10 ms
   SetTimer();
 
+  // Drive Straight when Running
   if (running) {
     KeepStraight();
   }
@@ -92,6 +103,7 @@ void loop() {
 
 void motorA(direction status, int speed) {
   if (status == STOP) {
+    // Stop Moving
     analogWrite(ENA, speed);
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
@@ -116,6 +128,7 @@ void motorA(direction status, int speed) {
 
 void motorB(direction status, int speed) {
   if (status == STOP) {
+    // Stop Moving
     analogWrite(ENB, speed);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
@@ -155,12 +168,10 @@ void SetPins(){
 void BLESetup(){
  //This while loop ensures that we are connected to the BLESerial
   while (BLESerial.available() > 0) {
-      
     char next_char = (char) BLESerial.read(); //reads each character because the .read function can read one character at a time
     temp_message += next_char; //concatenates all characters put in terminal from phone
 
     if (next_char == '\n') {
-
       message = temp_message;
       temp_message = ""; //resets temp_message in terminal
       Serial.print(message);
@@ -180,15 +191,11 @@ void BLESetup(){
        BLESerial.print(message);
       }
     }
-
   }
-
 }
 
 void SetTimer(){
-
   if((millis()-timer)>10) {
-	
     angleX = mpu.getAngleX();
     angleY = mpu.getAngleY();
     angleZ = mpu.getAngleZ();
@@ -200,25 +207,25 @@ void SetTimer(){
 
 	  timer = millis();  
   }
-
 }
 
 void KeepStraight(){
-
   if (angleZ < -toleranceAngle) {
+    // Turning too far to the right
     motorA(FORWARD, SLOW_SPEED);
     motorB(FORWARD, MAX_SPEED);
     Serial.println("Turning too far to the right");
   }
   else if (angleZ > toleranceAngle) {
+    // Turning too far to the left
     motorA(FORWARD, MAX_SPEED);
     motorB(FORWARD, SLOW_SPEED);
     Serial.println("Turning too far to the left");
   }
   else {
+    // Keep moving forward
     motorA(FORWARD, MAX_SPEED);
     motorB(FORWARD, MAX_SPEED);
     Serial.println("Continue moving forward");
   }
-
 }
