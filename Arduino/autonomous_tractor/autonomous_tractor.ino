@@ -25,8 +25,11 @@ float toleranceAngle = 1.0;
 int MAX_SPEED = 255; 
 int SLOW_SPEED = 100;
 int STOP_SPEED = 0;
+long duration; 
+int distance; 
 
 // Definitions Arduino Pins
+int ECHO = 3;
 int IN1 = 4;
 int IN2 = 5;
 int IN3 = 6;
@@ -82,6 +85,8 @@ void setup()
 }
 
 void loop() {
+
+
   // Parse and Handle BLE
   BLESetup();
 
@@ -90,6 +95,11 @@ void loop() {
 
   // Grab gyro data and check pushbutton every 10 ms
   SetTimer();
+
+  duration = pulseIn(ECHO, HIGH);
+  distance = duration*.034/2; 
+  Serial.print("Distance: "); 
+  Serial.println(distance);
 
   // Drive Straight when Running
   if (running) {
@@ -163,6 +173,7 @@ void SetPins(){
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(PUSHBUTTON_PIN, INPUT);
+  pinMode(ECHO, INPUT);
 }
 
 void BLESetup(){
