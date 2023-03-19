@@ -29,7 +29,8 @@ long duration;
 int distance; 
 
 // Definitions Arduino Pins
-int ECHO = 3;
+int EMERGENCY_STOP = 2;
+int TRIG = 3;
 int IN1 = 4;
 int IN2 = 5;
 int IN3 = 6;
@@ -96,19 +97,30 @@ void loop() {
   // Grab gyro data and check pushbutton every 10 ms
   SetTimer();
 
-  duration = pulseIn(ECHO, HIGH);
-  distance = duration*.034/2; 
-  Serial.print("Distance: "); 
-  Serial.println(distance);
 
-  // Drive Straight when Running
-  if (running) {
-    KeepStraight();
-  }
-  else {
+  /*digitalWrite(TRIG, LOW); 
+  delay(50);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10); 
+  digitalWrite(TRIG,LOW);
+*/
+ // Drive Straight when Running
+    if (running) {
+     KeepStraight();
+    }
+    else {
+      motorA(STOP, STOP_SPEED);
+      motorB(STOP, STOP_SPEED);
+    }
+ /* 
+  if(digitalRead(EMERGENCY_STOP) == HIGH){
     motorA(STOP, STOP_SPEED);
     motorB(STOP, STOP_SPEED);
   }
+  else{
+
+  }  
+*/
 }
 
 void motorA(direction status, int speed) {
@@ -173,7 +185,8 @@ void SetPins(){
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(PUSHBUTTON_PIN, INPUT);
-  pinMode(ECHO, INPUT);
+  pinMode(TRIG, OUTPUT);
+  pinMode(EMERGENCY_STOP, INPUT);
 }
 
 void BLESetup(){
