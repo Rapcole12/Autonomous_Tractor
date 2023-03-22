@@ -69,7 +69,7 @@ void setup()
   Serial.begin(9600);  // Serial Monitor
   BLESerial.begin(9600);  // Bluetooth Terminal
   Wire.begin(); // Gyroscope
-  byte status = mpu.begin();
+  byte status =0; // mpu.begin();
   
   // Stop if gyro can't connect
   while (status != 0) {
@@ -97,13 +97,13 @@ void loop() {
   // Grab gyro data and check pushbutton every 10 ms
   SetTimer();
 
-
-  /*digitalWrite(TRIG, LOW); 
-  delay(50);
+  digitalWrite(TRIG,LOW);
+  delayMicroseconds(2);
   digitalWrite(TRIG, HIGH);
   delayMicroseconds(10); 
   digitalWrite(TRIG,LOW);
-*/
+
+
  // Drive Straight when Running
     if (running) {
      KeepStraight();
@@ -111,16 +111,16 @@ void loop() {
     else {
       motorA(STOP, STOP_SPEED);
       motorB(STOP, STOP_SPEED);
-    }
- /* 
-  if(digitalRead(EMERGENCY_STOP) == HIGH){
-    motorA(STOP, STOP_SPEED);
-    motorB(STOP, STOP_SPEED);
-  }
-  else{
+    } 
 
-  }  
-*/
+   // if(ReadpinforXseconds() == true){
+
+     // motorA(STOP, STOP_SPEED);
+     // motorB(STOP, STOP_SPEED);
+
+    //}
+
+
 }
 
 void motorA(direction status, int speed) {
@@ -251,5 +251,32 @@ void KeepStraight(){
     motorA(FORWARD, MAX_SPEED);
     motorB(FORWARD, MAX_SPEED);
     Serial.println("Continue moving forward");
+  }
+}
+
+boolean ReadpinforXseconds(){
+
+  static unsigned long last_time = 0;
+  unsigned long current_time = 0;
+  if(digitalRead(EMERGENCY_STOP) == LOW){
+
+    current_time = millis();
+
+    if(current_time - last_time>= 1 && current_time - last_time <= 26){
+
+      last_time = current_time;
+      
+    }
+    else if (current_time - last_time > 26 && current_time - last_time <= 27) {
+     
+      return true;
+    }
+    else if(current_time - last_time > 27){
+      last_time = 0; 
+      return true;
+    }
+
+  return false;
+
   }
 }
