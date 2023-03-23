@@ -18,6 +18,7 @@ Included Features: L298N Motor Driver, HM-10 BLE Module, MPU-9250 Gyroscope
 // Init Gyroscope
 MPU6050 mpu(Wire);
 unsigned long timer = 0;
+unsigned long last_time = 0;
 float angleX = 0;
 float angleY = 0;
 float angleZ = 0;
@@ -60,6 +61,8 @@ String message = ""; //this will be the actual message that will determine wehth
 // Is the tractor running?
 bool running = false;
 
+int val = 0;
+
 void setup()
 {
   // Init Pins as INPUT or OUTPUT
@@ -69,7 +72,7 @@ void setup()
   Serial.begin(9600);  // Serial Monitor
   BLESerial.begin(9600);  // Bluetooth Terminal
   Wire.begin(); // Gyroscope
-  byte status =0; // mpu.begin();
+  byte status = mpu.begin();
   
   // Stop if gyro can't connect
   while (status != 0) {
@@ -97,13 +100,6 @@ void loop() {
   // Grab gyro data and check pushbutton every 10 ms
   SetTimer();
 
-  digitalWrite(TRIG,LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG, HIGH);
-  delayMicroseconds(10); 
-  digitalWrite(TRIG,LOW);
-
-
  // Drive Straight when Running
     if (running) {
      KeepStraight();
@@ -120,7 +116,34 @@ void loop() {
 
     //}
 
+    //ReadpinforXseconds();
 
+    digitalWrite(TRIG,LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIG, HIGH);
+    delayMicroseconds(10); 
+    digitalWrite(TRIG,LOW);
+
+    int eStop = digitalRead(EMERGENCY_STOP);
+    //Serial.println(eStop);
+    //Serial.println(last_time);
+    if (eStop == 0) {
+      //Serial.println("START TIMER HERE");
+      //Serial.println(timer);
+      last_time = timer;
+    }
+
+    val = 0;
+    if (timer - last_time > 200) {
+      //delay(100);
+      val = 1;
+    }
+    Serial.println(val);
+    
+    if (val == 1) {
+      //BLESerial.println("EMERGENCY STOP");
+      //running = false;
+    }
 }
 
 void motorA(direction status, int speed) {
@@ -254,29 +277,25 @@ void KeepStraight(){
   }
 }
 
-boolean ReadpinforXseconds(){
-
+bool ReadpinforXseconds(){
   static unsigned long last_time = 0;
-  unsigned long current_time = 0;
+
+  Serial.print("Current Time: ");
+  Serial.println(timer);
+  Serial.print("Last Time: ");
+  Serial.println(last_time);
+
+  // Start Timer
   if(digitalRead(EMERGENCY_STOP) == LOW){
+    last_time = timer;
+  }
 
-    current_time = millis();
-
-    if(current_time - last_time>= 1 && current_time - last_time <= 26){
-
-      last_time = current_time;
-      
-    }
-    else if (current_time - last_time > 26 && current_time - last_time <= 27) {
-     
-      return true;
-    }
-    else if(current_time - last_time > 27){
-      last_time = 0; 
-      return true;
-    }
+  // Timer Expired
+  if (timer - last_time == 750) {
+    // CONSTANT 1's
+    // EMERGENCY STOP HERE
+    return true;
+  }
 
   return false;
-
-  }
 }
