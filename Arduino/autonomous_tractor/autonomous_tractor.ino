@@ -61,7 +61,7 @@ String message = ""; //this will be the actual message that will determine wehth
 // Is the tractor running?
 bool running = false;
 
-int val = 0;
+int zeroDetect = 0;
 
 void setup()
 {
@@ -89,8 +89,6 @@ void setup()
 }
 
 void loop() {
-
-
   // Parse and Handle BLE
   BLESetup();
 
@@ -109,15 +107,6 @@ void loop() {
       motorB(STOP, STOP_SPEED);
     } 
 
-   // if(ReadpinforXseconds() == true){
-
-     // motorA(STOP, STOP_SPEED);
-     // motorB(STOP, STOP_SPEED);
-
-    //}
-
-    //ReadpinforXseconds();
-
     digitalWrite(TRIG,LOW);
     delayMicroseconds(2);
     digitalWrite(TRIG, HIGH);
@@ -125,24 +114,11 @@ void loop() {
     digitalWrite(TRIG,LOW);
 
     int eStop = digitalRead(EMERGENCY_STOP);
-    //Serial.println(eStop);
-    //Serial.println(last_time);
-    if (eStop == 0) {
-      //Serial.println("START TIMER HERE");
-      //Serial.println(timer);
-      last_time = timer;
-    }
+    bool constantOnes = detectConstantOnes(eStop);
 
-    val = 0;
-    if (timer - last_time > 200) {
-      //delay(100);
-      val = 1;
-    }
-    Serial.println(val);
-    
-    if (val == 1) {
-      //BLESerial.println("EMERGENCY STOP");
-      //running = false;
+    if (constantOnes) {
+      motorA(STOP, 0);
+      motorB(STOP, 0);
     }
 }
 
@@ -261,41 +237,30 @@ void KeepStraight(){
     // Turning too far to the right
     motorA(FORWARD, SLOW_SPEED);
     motorB(FORWARD, MAX_SPEED);
-    Serial.println("Turning too far to the right");
+    //Serial.println("Turning too far to the right");
   }
   else if (angleZ > toleranceAngle) {
     // Turning too far to the left
     motorA(FORWARD, MAX_SPEED);
     motorB(FORWARD, SLOW_SPEED);
-    Serial.println("Turning too far to the left");
+    //Serial.println("Turning too far to the left");
   }
   else {
     // Keep moving forward
     motorA(FORWARD, MAX_SPEED);
     motorB(FORWARD, MAX_SPEED);
-    Serial.println("Continue moving forward");
+    //Serial.println("Continue moving forward");
   }
 }
 
-bool ReadpinforXseconds(){
-  static unsigned long last_time = 0;
-
-  Serial.print("Current Time: ");
-  Serial.println(timer);
-  Serial.print("Last Time: ");
-  Serial.println(last_time);
-
-  // Start Timer
-  if(digitalRead(EMERGENCY_STOP) == LOW){
-    last_time = timer;
+bool detectConstantOnes(int i) {
+  zeroDetect++;
+  if (i == 0) {
+    zeroDetect = 0;
   }
 
-  // Timer Expired
-  if (timer - last_time == 750) {
-    // CONSTANT 1's
-    // EMERGENCY STOP HERE
+  if (zeroDetect > 15) {
     return true;
   }
-
   return false;
 }
