@@ -28,6 +28,7 @@ int SLOW_SPEED = 100;
 int STOP_SPEED = 0;
 long duration; 
 int distance; 
+int IR_THRESHOLD = 200;
 
 // Definitions Arduino Pins
 int EMERGENCY_STOP = 2;
@@ -41,6 +42,7 @@ int TX_PIN = 8;
 int ENA = 10;
 int ENB = 11;
 int PUSHBUTTON_PIN = 13;
+int IR_DIODE = A0;
 
 // Init BLE
 SoftwareSerial BLESerial(RX_PIN, TX_PIN); //call the constructor for Software Serial
@@ -62,6 +64,7 @@ String message = ""; //this will be the actual message that will determine wehth
 bool running = false;
 
 int zeroDetect = 0;
+int blackTapeDetect = 0;
 
 void setup()
 {
@@ -119,6 +122,12 @@ void loop() {
     if (constantOnes) {
       motorA(STOP, 0);
       motorB(STOP, 0);
+    }
+
+    blackTapeDetect = analogRead(IR_DIODE);
+    //Serial.println(blackTapeDetect);
+    if (blackTapeDetect < IR_THRESHOLD) {
+      Serial.println("DETECTED BLACK TAPE");
     }
 }
 
@@ -186,6 +195,7 @@ void SetPins(){
   pinMode(PUSHBUTTON_PIN, INPUT);
   pinMode(TRIG, OUTPUT);
   pinMode(EMERGENCY_STOP, INPUT);
+  pinMode(IR_DIODE, INPUT);
 }
 
 void BLESetup(){
