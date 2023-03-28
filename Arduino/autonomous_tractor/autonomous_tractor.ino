@@ -67,6 +67,7 @@ bool running = false;
 int zeroDetect = 0;
 int blackTapeDetect = 0;
 int counter = 0;
+int numBlackTapes = 0;
 
 void setup()
 {
@@ -129,7 +130,13 @@ void loop() {
     blackTapeDetect = analogRead(IR_DIODE);
     //Serial.println(blackTapeDetect);
     if (blackTapeDetect < IR_THRESHOLD && counter == 0) {
-      bearing += 90;
+      numBlackTapes++;
+      if (numBlackTapes == 3 || numBlackTapes == 4) {
+        bearing -= 90;
+      }
+      else {
+        bearing += 90;
+      }
       if (bearing >= 360) {
         bearing = bearing - 360;
       }
