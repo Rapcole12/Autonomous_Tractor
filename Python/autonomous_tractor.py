@@ -11,7 +11,7 @@ test2 = True;
 if test1 and test2:
     print("Hello World")
 
-def myFunction(a, b, c):
+def myFunction(a, b, c, d):
     return a + b + c
 
 """ MATLAB
