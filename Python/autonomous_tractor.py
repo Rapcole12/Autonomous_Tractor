@@ -1,37 +1,29 @@
-#no semicolons
-#all variables are automatically dynamically typed
-#In python there is no curly braces, everything is indentation
-
+# Import Pygame
 import pygame
 
-test1 = True;
+# Init Pygame
+pygame.init()
 
-test2 = True;
+# Set Window
+WINDOW_HEIGHT = 500
+WINDOW_WIDTH = 800
+window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-if test1 and test2:
-    print("Hello World")
+# Is the GUI running?
+running = True
+color = "red"
 
-def myFunction(a, b, c, d):
-    return a + b + c
+# Main Loop
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-""" MATLAB
-for i = 1:5
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                color = "green"
 
-end
-"""
+    window.fill(color)
 
-""" C / C++
-
-for (int i = 0; i < 5; i++) {
+    pygame.display.update()
     
-}
-
-"""
-
-# MATLAB: 0:5 == [0, 1, 2, 3, 4, 5]
-
-# Python: range(0, 5) == [0, 1, 2, 3, 4]
-
-    
-        
-
