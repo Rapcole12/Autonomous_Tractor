@@ -26,4 +26,6 @@ while running:
     window.fill(color)
 
     pygame.display.update()
+
+pygame.quit()
     
