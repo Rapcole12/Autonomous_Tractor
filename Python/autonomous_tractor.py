@@ -14,6 +14,7 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 running = True
 color = "red"
 
+##SET THE TEXT
 white = (255,255,255)
 black = (0,0,0)
 
@@ -27,6 +28,7 @@ textRect = text.get_rect()
 textRect.center = (WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
 """
 
+##SET THE IMAGE
 image_extration = pygame.image.load("Tractor.png")
 
 # TODO: Every time the enter key is pressed, print "ENTER" to the console, set screen to "blue"
@@ -65,7 +67,7 @@ while running:
                  
     window.fill(color)
     #Start drawing Strings HERE
-    window.blit(text,(360,50))
+    window.blit(text,(360,50)) ## LOWER Y COORDINATE MEANS GO UP and LOWER X COORDINATE MEANS GO LEFT
     window.blit(image_extration, (275,250))
 
     pygame.display.update()
