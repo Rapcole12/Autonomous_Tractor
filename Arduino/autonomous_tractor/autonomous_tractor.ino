@@ -127,6 +127,7 @@ void loop() {
       motorB(STOP, 0);
     }
 
+    /*
     blackTapeDetect = analogRead(IR_DIODE);
     //Serial.println(blackTapeDetect);
     if (blackTapeDetect < IR_THRESHOLD && counter == 0) {
@@ -149,7 +150,7 @@ void loop() {
         counter = 0;
       }
     }
-  
+    */
 
     //Serial.println(counter);
     //Serial.println(bearing);
