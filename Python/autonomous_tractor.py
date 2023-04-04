@@ -9,12 +9,30 @@ WINDOW_HEIGHT = 500
 WINDOW_WIDTH = 800
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+
 # Is the GUI running?
 running = True
 color = "red"
 
+white = (255,255,255)
+black = (0,0,0)
+
+font = pygame.font.SysFont("timesnewroman", 20)
+
+text =  font.render('ECE 2804', True, black, white)
+
+"""
+textRect = text.get_rect()
+
+textRect.center = (WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
+"""
+
+image_extration = pygame.image.load("Tractor.png")
+
 # TODO: Every time the enter key is pressed, print "ENTER" to the console, set screen to "blue"
-# TODO: Every time the backspace key is pressed, print "BACKSPACE" to the console, set screen to "yellow"
+# DONE
+# TODO: Every time the backspace key is pressed, print "BACKSPACE" to the console, set screen to "yellow" 
+# DONE 
 # https://www.pygame.org/docs/ref/key.html
 # Use if statements similar to event.key == pygame.K_SPACE
 
@@ -30,6 +48,7 @@ color = "red"
 
 # Main Loop
 while running:
+    #This is for user inputs
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -37,8 +56,17 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 color = "green"
-
+            if event.key == pygame.K_RETURN: 
+                color = "blue"
+                print("PRESSED ENTER")
+            if event.key == pygame.K_BACKSPACE:
+                color = "yellow"
+                print("PRESSED BACKSPACE")
+                 
     window.fill(color)
+    #Start drawing Strings HERE
+    window.blit(text,(360,50))
+    window.blit(image_extration, (275,250))
 
     pygame.display.update()
 
