@@ -24,11 +24,19 @@ rect = pygame.Rect(0,WINDOW_HEIGHT-Rec_Height,Rec_Width,Rec_Height)
 ##Set the Clouds 
 Elipse_width = 125
 Elipse_height = 50
-Elipse_cloud_1 = pygame.Rect(50, 75, Elipse_width, Elipse_height)
-Elipse_cloud_2 = pygame.Rect(200, 100, Elipse_width, Elipse_height)
+Elipse_cloud_1 = pygame.Rect(35, 60, Elipse_width, Elipse_height)
+Elipse_cloud_2 = pygame.Rect(200, 85, Elipse_width, Elipse_height)
+Elipse_cloud_3 = pygame.Rect(365, 35, Elipse_width, Elipse_height)
+Elipse_cloud_4 = pygame.Rect(500, 110, Elipse_width, Elipse_height)
+Elipse_cloud_5 = pygame.Rect(650, 10, Elipse_width, Elipse_height)
 
 
-
+##SET Tractor 
+Tractor = pygame.image.load('Tractor_transparent.png');
+Tractor_rect = Tractor.get_rect()
+Tractor = pygame.transform.scale(Tractor, (Tractor_rect.width // 2, Tractor_rect.height // 2))
+Tractor_rect = Tractor.get_rect()
+Tractor_rect.center = (150, 335)
 # Is the GUI running?
 running = True
 
@@ -42,7 +50,7 @@ text =  font.render('ECE 2804', True, black, white)
 textRect = text.get_rect()
 textRect.center = (WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
 """
-
+ 
 
 
 # Main Loop
@@ -72,6 +80,10 @@ while running:
     pygame.draw.rect(window,light_green ,rect)
     pygame.draw.ellipse(window,white, Elipse_cloud_1)
     pygame.draw.ellipse(window,white, Elipse_cloud_2)
+    pygame.draw.ellipse(window,white, Elipse_cloud_3)
+    pygame.draw.ellipse(window, white, Elipse_cloud_4)
+    pygame.draw.ellipse(window, white, Elipse_cloud_5)
+    window.blit(Tractor,Tractor_rect)
     pygame.display.update()
 
 pygame.quit()
