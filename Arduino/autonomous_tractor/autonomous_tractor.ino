@@ -23,12 +23,12 @@ float angleX = 0;
 float angleY = 0;
 float angleZ = 0;
 float toleranceAngle = 1.0;
-int MAX_SPEED = 120; 
-int SLOW_SPEED = 0;  // CHANGED FROM 100 to 50
+int MAX_SPEED = 80; 
+int SLOW_SPEED = 20;  // CHANGED FROM 100 to 50
 int STOP_SPEED = 0;
 long duration; 
 int distance; 
-int IR_THRESHOLD = 400;
+int IR_THRESHOLD = 50;
 int bearing = 0;
 
 // Definitions Arduino Pins
@@ -127,7 +127,6 @@ void loop() {
       motorB(STOP, 0);
     }
 
-    /*
     blackTapeDetect = analogRead(IR_DIODE);
     //Serial.println(blackTapeDetect);
     if (blackTapeDetect < IR_THRESHOLD && counter == 0) {
@@ -150,7 +149,6 @@ void loop() {
         counter = 0;
       }
     }
-    */
 
     //Serial.println(counter);
     //Serial.println(bearing);
@@ -270,14 +268,26 @@ void SetTimer(){
 void KeepStraight(){
   if (angleZ < -toleranceAngle + bearing) {
     // Turning too far to the right
-    motorA(FORWARD, SLOW_SPEED);
     motorB(FORWARD, MAX_SPEED);
+
+    if (counter == 0) {  // Not Turning
+      motorA(FORWARD, SLOW_SPEED);
+    }
+    else {
+      motorA(STOP, 0);
+    }
     //Serial.println("Turning too far to the right");
   }
   else if (angleZ > toleranceAngle + bearing) {
     // Turning too far to the left
     motorA(FORWARD, MAX_SPEED);
-    motorB(FORWARD, SLOW_SPEED);
+
+    if (counter == 0) {  // Not Turning
+      motorB(FORWARD, SLOW_SPEED);
+    }
+    else {
+      motorB(STOP, 0);
+    }
     //Serial.println("Turning too far to the left");
   }
   else {
