@@ -90,10 +90,24 @@ def pygame_mainloop():
     window.blit(text, textRect)
     pygame.display.update()
 
+numTapes = 0
 
 # Main Program
 async def main():
     async with BleakClient(BLE_ADDRESS) as client:
+        # Enable Notifications
+        def callback(sender, data):
+            # Decode the Byte Array
+            message = data.decode("ASCII").strip()
+
+            print(message)
+
+            if (message == 'Turned OFF'):
+                global numTapes
+                numTapes += 1
+
+        await client.start_notify(BLE_UUID, callback)
+        
         # Init Pygame
         pygame.init()
         pygame.font.init()
@@ -107,10 +121,15 @@ async def main():
         textRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
         # Set Window
-        global window, running
+        global window, running, numTapes
         window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+        #await client.write_gatt_char(BLE_UUID, OFF)
         while (running):
+            await client.read_gatt_char(BLE_UUID)
+
+            print(numTapes)
+
             # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
@@ -126,6 +145,8 @@ async def main():
                 print("BLE SPACE BAR")
             if (pressedBackspace):
                 # TODO: Add Backspace Functionality?
+                #receivedUseful = False
+                await client.write_gatt_char(BLE_UUID, "a\n".encode("ASCII"))
                 print("BLE BACKSPACE")
 
             # Update Pygame
