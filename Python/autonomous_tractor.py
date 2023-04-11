@@ -102,7 +102,7 @@ async def main():
 
             print(message)
 
-            if (message == 'Turned OFF'):
+            if (message == 'BLACK TAPE'):
                 global numTapes
                 numTapes += 1
 

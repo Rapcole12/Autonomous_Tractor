@@ -28,7 +28,7 @@ int SLOW_SPEED = 20;  // CHANGED FROM 100 to 50
 int STOP_SPEED = 0;
 long duration; 
 int distance; 
-int IR_THRESHOLD = 50;
+int IR_THRESHOLD = 100;
 int bearing = 0;
 
 // Definitions Arduino Pins
@@ -131,6 +131,7 @@ void loop() {
     //Serial.println(blackTapeDetect);
     if (blackTapeDetect < IR_THRESHOLD && counter == 0) {
       numBlackTapes++;
+      BLESerial.print("BLACK TAPE\n");
       if (numBlackTapes == 3 || numBlackTapes == 4) {
         bearing -= 90;
       }
