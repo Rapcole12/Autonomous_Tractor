@@ -15,6 +15,7 @@ from cmath import rect
 from operator import length_hint
 import pygame
 
+# Window Size
 WINDOW_HEIGHT = 500
 WINDOW_WIDTH = 800
 
@@ -63,11 +64,12 @@ running = True
 def pygame_mainloop():
     global running, pressedSpaceBar, pressedEnterKey, pressedBackspace
 
+    # Reset Input Flags
     pressedSpaceBar = False
     pressedEnterKey = False
     pressedBackspace = False
 
-    #This is for user inputs
+    # Update User Inputs
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -79,12 +81,11 @@ def pygame_mainloop():
                 pressedEnterKey = True
             if event.key == pygame.K_BACKSPACE:
                 pressedBackspace = True
-            
-    #Start drawing Strings HERE
-        
+                    
     #window.blit(text,(360,50)) ## LOWER Y COORDINATE MEANS GO UP and LOWER X COORDINATE MEANS GO LEFT
     #window.blit(image_extration, (275,250))
     
+    # Draw to the Screen
     window.fill(light_blue)
     pygame.draw.rect(window,light_green ,rect)
     pygame.draw.ellipse(window,white, Elipse_cloud_1)
@@ -107,6 +108,7 @@ async def main():
         window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
         while (running):
+            # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
                 print("DISCONNECTED")
@@ -120,8 +122,10 @@ async def main():
                 await client.write_gatt_char(BLE_UUID, OFF)
                 print("BLE SPACE BAR")
             if (pressedBackspace):
+                # TODO: Add Backspace Functionality?
                 print("BLE BACKSPACE")
 
+            # Update Pygame
             pygame_mainloop()
 
 # Run the program
@@ -130,5 +134,4 @@ asyncio.run(main())
 # Quit when done
 pygame.quit()
     
-
     
