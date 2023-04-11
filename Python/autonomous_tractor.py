@@ -46,13 +46,6 @@ Tractor = pygame.transform.scale(Tractor, (Tractor_rect.width // 2, Tractor_rect
 Tractor_rect = Tractor.get_rect()
 Tractor_rect.center = (150, 335)
 
-# SET THE TEXT
-#font = pygame.font.SysFont("timesnewroman", 20)
-#text =  font.render('ECE 2804', True, black, white)
-
-#textRect = text.get_rect()
-#textRect.center = (WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
-
 # User inputs
 pressedSpaceBar = False
 pressedEnterKey = False
@@ -93,7 +86,8 @@ def pygame_mainloop():
     pygame.draw.ellipse(window,white, Elipse_cloud_3)
     pygame.draw.ellipse(window, white, Elipse_cloud_4)
     pygame.draw.ellipse(window, white, Elipse_cloud_5)
-    window.blit(Tractor,Tractor_rect)
+    window.blit(Tractor, Tractor_rect)
+    window.blit(text, textRect)
     pygame.display.update()
 
 
@@ -102,6 +96,15 @@ async def main():
     async with BleakClient(BLE_ADDRESS) as client:
         # Init Pygame
         pygame.init()
+        pygame.font.init()
+
+        # Set the Text
+        global text, textRect
+        font = pygame.font.SysFont("timesnewroman", 20)
+        text =  font.render('ECE 2804 Autonomous Tractor', True, black, white)
+
+        textRect = text.get_rect()
+        textRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
         # Set Window
         global window, running
