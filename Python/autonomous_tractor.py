@@ -52,11 +52,20 @@ Tractor_rect.center = (150, 335)
 #textRect = text.get_rect()
 #textRect.center = (WINDOW_WIDTH // 4, WINDOW_HEIGHT // 2)
 
+# User inputs
+pressedSpaceBar = False
+pressedEnterKey = False
+pressedBackspace = False
+
 # Is the GUI running?
 running = True
 
 def pygame_mainloop():
-    global running
+    global running, pressedSpaceBar, pressedEnterKey, pressedBackspace
+
+    pressedSpaceBar = False
+    pressedEnterKey = False
+    pressedBackspace = False
 
     #This is for user inputs
     for event in pygame.event.get():
@@ -65,13 +74,11 @@ def pygame_mainloop():
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                color = "green"
+                pressedSpaceBar = True
             if event.key == pygame.K_RETURN: 
-                color = "blue"
-                print("PRESSED ENTER")
+                pressedEnterKey = True
             if event.key == pygame.K_BACKSPACE:
-                color = "yellow"
-                print("PRESSED BACKSPACE")
+                pressedBackspace = True
             
     #Start drawing Strings HERE
         
@@ -100,7 +107,21 @@ async def main():
         window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
         while (running):
-            print("INSIDE BLE")
+            if (not client.is_connected):
+                running = False
+                print("DISCONNECTED")
+
+            if (pressedEnterKey):
+                # Turn ON
+                await client.write_gatt_char(BLE_UUID, ON)
+                print("BLE ENTER KEY")
+            if (pressedSpaceBar):
+                # Turn OFF
+                await client.write_gatt_char(BLE_UUID, OFF)
+                print("BLE SPACE BAR")
+            if (pressedBackspace):
+                print("BLE BACKSPACE")
+
             pygame_mainloop()
 
 # Run the program
