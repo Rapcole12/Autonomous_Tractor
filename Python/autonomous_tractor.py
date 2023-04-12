@@ -24,6 +24,7 @@ white = (255,255,255)
 black = (0,0,0)
 light_blue = (173,216,230)
 light_green = (144,238,144)
+light_yellow = (241,235,156)
 
 # Set Grass 
 Rec_Width = 800
@@ -45,6 +46,32 @@ Tractor_rect = Tractor.get_rect()
 Tractor = pygame.transform.scale(Tractor, (Tractor_rect.width // 2, Tractor_rect.height // 2))
 Tractor_rect = Tractor.get_rect()
 Tractor_rect.center = (150, 335)
+
+# Set the crops 
+Rec_Width_Crop  = 2; 
+Rect_Height_Crop = 75; 
+rect_crop_1 = pygame.Rect(400,WINDOW_HEIGHT - 125,Rec_Width_Crop, Rect_Height_Crop );
+rect_crop_2 = pygame.Rect(475,WINDOW_HEIGHT - 125,Rec_Width_Crop, Rect_Height_Crop );
+rect_crop_3 = pygame.Rect(550,WINDOW_HEIGHT - 125,Rec_Width_Crop, Rect_Height_Crop );
+rect_crop_4 = pygame.Rect(625,WINDOW_HEIGHT - 125,Rec_Width_Crop, Rect_Height_Crop );
+rect_crop_5 = pygame.Rect(700,WINDOW_HEIGHT - 125,Rec_Width_Crop, Rect_Height_Crop );
+
+##Set the top of the crops 
+Elipse_width_crop = 15
+Elipse_height_crop = 50
+Elipse_crop_1 = pygame.Rect(393,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
+Elipse_crop_2 = pygame.Rect(468,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
+Elipse_crop_3 = pygame.Rect(543,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
+Elipse_crop_4 = pygame.Rect(618,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
+Elipse_crop_5 = pygame.Rect(693,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
+
+#Set Buttons 
+Button_Width_Start = 175
+Button_Height_Start = 50
+Button_Start = pygame.Rect(0, 0,Button_Width_Start, Button_Height_Start);
+Button_Width_Stop = 425
+Button_Height_Stop = 50
+Button_Stop = pygame.Rect(0, 0,Button_Width_Stop, Button_Height_Stop);
 
 # User inputs
 pressedSpaceBar = False
@@ -81,11 +108,28 @@ def pygame_mainloop():
     # Draw to the Screen
     window.fill(light_blue)
     pygame.draw.rect(window,light_green ,rect)
+    ##Draw Crops 
+    pygame.draw.rect(window,light_yellow,rect_crop_1); 
+    pygame.draw.rect(window,light_yellow,rect_crop_2); 
+    pygame.draw.rect(window,light_yellow,rect_crop_3); 
+    pygame.draw.rect(window,light_yellow,rect_crop_4); 
+    pygame.draw.rect(window,light_yellow,rect_crop_5); 
+
+    pygame.draw.ellipse(window,light_yellow,Elipse_crop_1); 
+    pygame.draw.ellipse(window,light_yellow,Elipse_crop_2); 
+    pygame.draw.ellipse(window,light_yellow,Elipse_crop_3); 
+    pygame.draw.ellipse(window,light_yellow,Elipse_crop_4); 
+    pygame.draw.ellipse(window,light_yellow,Elipse_crop_5); 
+
+    #Draw Clouds 
     pygame.draw.ellipse(window,white, Elipse_cloud_1)
     pygame.draw.ellipse(window,white, Elipse_cloud_2)
     pygame.draw.ellipse(window,white, Elipse_cloud_3)
     pygame.draw.ellipse(window, white, Elipse_cloud_4)
     pygame.draw.ellipse(window, white, Elipse_cloud_5)
+
+    window.blit(Button_Start_Text,Button_Start_Text_Rect)
+    window.blit(Button_Stop_Text,Button_Stop_Text_Rect)
     window.blit(Tractor, Tractor_rect)
     window.blit(text, textRect)
     pygame.display.update()
@@ -113,10 +157,15 @@ async def main():
         pygame.font.init()
 
         # Set the Text
-        global text, textRect
-        font = pygame.font.SysFont("timesnewroman", 20)
+        global text, textRect, Button_Start_Text, Button_Start_Text_Rect, Button_Stop_Text_Rect, Button_Stop_Text
+        font = pygame.font.SysFont("timesnewroman", 40)
         text =  font.render('ECE 2804 Autonomous Tractor', True, black, white)
+        Button_Start_Text = font.render('START', True, black, white)
+        Button_Stop_Text = font.render('STOP', True, black, white)
 
+
+        Button_Start_Text_Rect = Button_Start_Text.get_rect(center=Button_Start.center)
+        Button_Stop_Text_Rect = Button_Stop_Text.get_rect(center=Button_Stop.center)
         textRect = text.get_rect()
         textRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
@@ -154,6 +203,7 @@ async def main():
 
 # Run the program
 asyncio.run(main())
+
 
 # Quit when done
 pygame.quit()
