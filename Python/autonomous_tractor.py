@@ -10,6 +10,50 @@ BLE_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb"
 ON = "ON\n".encode("ASCII")
 OFF = "OFF\n".encode("ASCII")
 
+# Create Timer
+import time
+import datetime
+
+start_time = 0
+current_time = 0
+ticking = False
+past_time_running = 0
+
+def start_timer():
+	global start_time, ticking
+	ticking = True
+	start_time = time.time()
+
+def calculate_time_elapsed():
+    if ticking:
+	    global start_time, current_time
+	    current_time = time.time()
+	    return (current_time - start_time)
+    else:
+        return 0
+
+def end_timer():
+    global ticking, past_time_running
+    past_time_running += calculate_time_elapsed()
+    ticking = False
+   
+def calculate_total_time():
+    global past_time_running
+    return round(past_time_running + calculate_time_elapsed(), 1)
+
+def formatted_time_string():
+    # Get Time Delta String
+    total_time_seconds = calculate_total_time()
+    time_delta = datetime.timedelta(seconds = total_time_seconds)
+    time_string = str(time_delta)
+
+    if (len(time_string) < 9): # Integer seconds
+        time_string += ".0"
+
+    time_string = time_string[2:9] # Chop off Hours and Millseconds
+    return time_string
+
+
 # Import Pygame
 from cmath import rect
 from operator import length_hint
@@ -177,24 +221,29 @@ async def main():
         while (running):
             await client.read_gatt_char(BLE_UUID)
 
-            print(numTapes)
+            #print(numTapes)
 
             # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
                 print("DISCONNECTED")
+            if (ticking):
+                print(formatted_time_string())
+                #print(past_time_running)
+
 
             if (pressedEnterKey):
                 # Turn ON
                 await client.write_gatt_char(BLE_UUID, ON)
+                start_timer()
                 print("BLE ENTER KEY")
             if (pressedSpaceBar):
                 # Turn OFF
                 await client.write_gatt_char(BLE_UUID, OFF)
+                end_timer()
                 print("BLE SPACE BAR")
             if (pressedBackspace):
                 # TODO: Add Backspace Functionality?
-                #receivedUseful = False
                 await client.write_gatt_char(BLE_UUID, "a\n".encode("ASCII"))
                 print("BLE BACKSPACE")
 
