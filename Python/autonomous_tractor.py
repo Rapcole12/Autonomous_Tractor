@@ -238,12 +238,12 @@ async def main():
             if (ticking):
                 print(formatted_time_string())
 
-            if (pressedStartButton):
+            if (pressedStartButton or pressedEnterKey):
                 # Turn ON
                 await client.write_gatt_char(BLE_UUID, ON)
                 start_timer()
                 print("BLE START")
-            if (pressedStopButton):
+            if (pressedStopButton or pressedSpaceBar):
                 # Turn OFF
                 await client.write_gatt_char(BLE_UUID, OFF)
                 end_timer()
