@@ -113,17 +113,23 @@ Elipse_crop_5 = pygame.Rect(693,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_he
 pressedSpaceBar = False
 pressedEnterKey = False
 pressedBackspace = False
+pressedStartButton = False 
+pressedStopButton = False
 
 # Is the GUI running?
 running = True
 
 def pygame_mainloop():
-    global running, pressedSpaceBar, pressedEnterKey, pressedBackspace
+    global running, pressedSpaceBar, pressedEnterKey, pressedBackspace, pressedStartButton, pressedStopButton
 
     # Reset Input Flags
     pressedSpaceBar = False
     pressedEnterKey = False
     pressedBackspace = False
+
+    #Set Button Press Boolean
+    pressedStartButton = False 
+    pressedStopButton = False
 
     # Update User Inputs
     for event in pygame.event.get():
@@ -132,8 +138,11 @@ def pygame_mainloop():
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if Button_Start_Text_Rect.collidepoint(event.pos):
+                pressedStartButton = True
                 print("Pressed START Button")
+                
             if Button_Stop_Text_Rect.collidepoint(event.pos):
+                pressedStopButton = True
                 print("Pressed STOP Button")
         
         if event.type == pygame.KEYDOWN:
@@ -229,16 +238,16 @@ async def main():
             if (ticking):
                 print(formatted_time_string())
 
-            if (pressedEnterKey):
+            if (pressedStartButton):
                 # Turn ON
                 await client.write_gatt_char(BLE_UUID, ON)
                 start_timer()
-                print("BLE ENTER KEY")
-            if (pressedSpaceBar):
+                print("BLE START")
+            if (pressedStopButton):
                 # Turn OFF
                 await client.write_gatt_char(BLE_UUID, OFF)
                 end_timer()
-                print("BLE SPACE BAR")
+                print("BLE STOP")
             if (pressedBackspace):
                 # TODO: Add Backspace Functionality?
                 await client.write_gatt_char(BLE_UUID, "a\n".encode("ASCII"))
