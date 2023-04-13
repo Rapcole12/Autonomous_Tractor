@@ -109,14 +109,6 @@ Elipse_crop_3 = pygame.Rect(543,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_he
 Elipse_crop_4 = pygame.Rect(618,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
 Elipse_crop_5 = pygame.Rect(693,WINDOW_HEIGHT - 175,Elipse_width_crop, Elipse_height_crop );
 
-#Set Buttons 
-Button_Width_Start = 175
-Button_Height_Start = 50
-Button_Start = pygame.Rect(0, 0,Button_Width_Start, Button_Height_Start);
-Button_Width_Stop = 425
-Button_Height_Stop = 50
-Button_Stop = pygame.Rect(0, 0,Button_Width_Stop, Button_Height_Stop);
-
 # User inputs
 pressedSpaceBar = False
 pressedEnterKey = False
@@ -137,6 +129,12 @@ def pygame_mainloop():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if Button_Start_Text_Rect.collidepoint(event.pos):
+                print("Pressed START Button")
+            if Button_Stop_Text_Rect.collidepoint(event.pos):
+                print("Pressed STOP Button")
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
@@ -145,13 +143,13 @@ def pygame_mainloop():
                 pressedEnterKey = True
             if event.key == pygame.K_BACKSPACE:
                 pressedBackspace = True
-                    
-    #window.blit(text,(360,50)) ## LOWER Y COORDINATE MEANS GO UP and LOWER X COORDINATE MEANS GO LEFT
-    #window.blit(image_extration, (275,250))
     
     # Draw to the Screen
     window.fill(light_blue)
+
+    # Draw the Ground
     pygame.draw.rect(window,light_green ,rect)
+
     ##Draw Crops 
     pygame.draw.rect(window,light_yellow,rect_crop_1); 
     pygame.draw.rect(window,light_yellow,rect_crop_2); 
@@ -207,9 +205,12 @@ async def main():
         Button_Start_Text = font.render('START', True, black, white)
         Button_Stop_Text = font.render('STOP', True, black, white)
 
+        Button_Start_Text_Rect = Button_Start_Text.get_rect()
+        Button_Start_Text_Rect.center = (85, 30)
 
-        Button_Start_Text_Rect = Button_Start_Text.get_rect(center=Button_Start.center)
-        Button_Stop_Text_Rect = Button_Stop_Text.get_rect(center=Button_Stop.center)
+        Button_Stop_Text_Rect = Button_Stop_Text.get_rect()
+        Button_Stop_Text_Rect.center = (225, 30)
+
         textRect = text.get_rect()
         textRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
@@ -221,16 +222,12 @@ async def main():
         while (running):
             await client.read_gatt_char(BLE_UUID)
 
-            #print(numTapes)
-
             # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
                 print("DISCONNECTED")
             if (ticking):
                 print(formatted_time_string())
-                #print(past_time_running)
-
 
             if (pressedEnterKey):
                 # Turn ON
