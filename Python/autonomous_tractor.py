@@ -183,6 +183,10 @@ def pygame_mainloop():
     window.blit(Button_Stop_Text,Button_Stop_Text_Rect)
     window.blit(Tractor, Tractor_rect)
     window.blit(text, textRect)
+
+    # Dynamic Text
+    window.blit(numBlackTapesText, numBlackTapesTextRect)
+
     pygame.display.update()
 
 numTapes = 0
@@ -201,6 +205,11 @@ async def main():
                 global numTapes
                 numTapes += 1
 
+                global numBlackTapesText, numBlackTapesTextRect
+                numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
+                numBlackTapesTextRect = numBlackTapesText.get_rect()
+                numBlackTapesTextRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+
         await client.start_notify(BLE_UUID, callback)
         
         # Init Pygame
@@ -210,7 +219,8 @@ async def main():
         # Set the Text
         global text, textRect, Button_Start_Text, Button_Start_Text_Rect, Button_Stop_Text_Rect, Button_Stop_Text
         font = pygame.font.SysFont("timesnewroman", 40)
-        text =  font.render('ECE 2804 Autonomous Tractor', True, black, white)
+        smallfont = pygame.font.SysFont("timesnewroman", 30)
+        text = smallfont.render('ECE 2804 Autonomous Tractor', True, black, white)
         Button_Start_Text = font.render('START', True, black, white)
         Button_Stop_Text = font.render('STOP', True, black, white)
 
@@ -221,10 +231,17 @@ async def main():
         Button_Stop_Text_Rect.center = (225, 30)
 
         textRect = text.get_rect()
-        textRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+        textRect.center = (WINDOW_WIDTH // 4, 20 + WINDOW_HEIGHT // 3)
+
+        # Dynamic Text
+        global numBlackTapesText, numBlackTapesTextRect, numTapes
+        numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
+        numBlackTapesTextRect = numBlackTapesText.get_rect()
+        numBlackTapesTextRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+
 
         # Set Window
-        global window, running, numTapes
+        global window, running
         window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
         #await client.write_gatt_char(BLE_UUID, OFF)
@@ -262,5 +279,10 @@ asyncio.run(main())
 
 # Quit when done
 pygame.quit()
-    
-    
+
+# Print Trip Report
+print("--------------------")
+print("Tractor Trip Report")
+print(f"Number of Black Tapes: {numTapes}")
+print(f"Total Time Driven: {formatted_time_string()}")
+print("--------------------")
