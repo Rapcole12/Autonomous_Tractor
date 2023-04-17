@@ -186,6 +186,7 @@ def pygame_mainloop():
 
     # Dynamic Text
     window.blit(numBlackTapesText, numBlackTapesTextRect)
+    window.blit(timeElapsedText, timeElapsedTextRect)
 
     pygame.display.update()
 
@@ -208,7 +209,7 @@ async def main():
                 global numBlackTapesText, numBlackTapesTextRect
                 numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
                 numBlackTapesTextRect = numBlackTapesText.get_rect()
-                numBlackTapesTextRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+                numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
 
         await client.start_notify(BLE_UUID, callback)
         
@@ -234,15 +235,19 @@ async def main():
         textRect.center = (WINDOW_WIDTH // 4, 20 + WINDOW_HEIGHT // 3)
 
         # Dynamic Text
-        global numBlackTapesText, numBlackTapesTextRect, numTapes
+        global numBlackTapesText, numBlackTapesTextRect, numTapes, timeElapsedTextRect, timeElapsedText
         numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
         numBlackTapesTextRect = numBlackTapesText.get_rect()
-        numBlackTapesTextRect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+        numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
 
+        timeElapsedText = smallfont.render(f"Total Time Driven: {formatted_time_string()}", True, black, white)
+        timeElapsedTextRect = timeElapsedText.get_rect()
+        timeElapsedTextRect.center = (200 + WINDOW_WIDTH // 2, 75 + WINDOW_HEIGHT // 3)
 
         # Set Window
         global window, running
         window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        pygame.display.set_caption("Raphael Rodriguez and Richard Martinez")
 
         #await client.write_gatt_char(BLE_UUID, OFF)
         while (running):
@@ -251,9 +256,12 @@ async def main():
             # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
-                print("DISCONNECTED")
+                #print("DISCONNECTED")
             if (ticking):
-                print(formatted_time_string())
+                timeElapsedText = smallfont.render(f"Total Time Driven: {formatted_time_string()}", True, black, white)
+                timeElapsedTextRect = timeElapsedText.get_rect()
+                timeElapsedTextRect.center = (200 + WINDOW_WIDTH // 2, 75 + WINDOW_HEIGHT // 3)
+                #print(formatted_time_string())
 
             if (pressedStartButton or pressedEnterKey):
                 # Turn ON
