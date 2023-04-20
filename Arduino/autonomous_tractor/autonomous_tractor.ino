@@ -121,10 +121,13 @@ void loop() {
 
     int eStop = digitalRead(EMERGENCY_STOP);
     bool constantOnes = detectConstantOnes(eStop);
+    //Serial.println(constantOnes);
+    //Serial.println(running);
 
     if (constantOnes) {
       motorA(STOP, 0);
       motorB(STOP, 0);
+      //Serial.println("EMERGENCY STOP");
     }
 
     blackTapeDetect = analogRead(IR_DIODE);
@@ -146,7 +149,7 @@ void loop() {
 
     if (counter > 0) {
       counter++;
-      if (counter == 250) {
+      if (counter == 300) {
         counter = 0;
       }
     }

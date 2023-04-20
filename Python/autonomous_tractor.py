@@ -202,14 +202,33 @@ async def main():
 
             print(message)
 
+            global numTapes, numBlackTapesText, numBlackTapesTextRect
+            global past_time_running, timeElapsedText, timeElapsedTextRect
+
             if (message == 'BLACK TAPE'):
-                global numTapes
+                #global numTapes
                 numTapes += 1
 
-                global numBlackTapesText, numBlackTapesTextRect
+                #global numBlackTapesText, numBlackTapesTextRect
                 numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
                 numBlackTapesTextRect = numBlackTapesText.get_rect()
                 numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
+
+            if (message == 'Ready to use!'):
+                #global numTapes, past_time_running
+                numTapes = 0
+                past_time_running = 0
+
+                #global numBlackTapesText, numBlackTapesTextRect
+                numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
+                numBlackTapesTextRect = numBlackTapesText.get_rect()
+                numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
+
+                #global timeElapsedText, timeElapsedTextRect
+                timeElapsedText = smallfont.render(f"Total Time Driven: {formatted_time_string()}", True, black, white)
+                timeElapsedTextRect = timeElapsedText.get_rect()
+                timeElapsedTextRect.center = (200 + WINDOW_WIDTH // 2, 75 + WINDOW_HEIGHT // 3)
+
 
         await client.start_notify(BLE_UUID, callback)
         
