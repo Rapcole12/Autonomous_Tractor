@@ -14,6 +14,7 @@ OFF = "OFF\n".encode("ASCII")
 import time
 import datetime
 
+# Initial Timer Parameters
 start_time = 0
 current_time = 0
 ticking = False
@@ -133,9 +134,11 @@ def pygame_mainloop():
 
     # Update User Inputs
     for event in pygame.event.get():
+        # Clicked X in Top Right of Window
         if event.type == pygame.QUIT:
             running = False
 
+        # Clicked a mouse button
         if event.type == pygame.MOUSEBUTTONDOWN:
             if Button_Start_Text_Rect.collidepoint(event.pos):
                 pressedStartButton = True
@@ -145,6 +148,7 @@ def pygame_mainloop():
                 pressedStopButton = True
                 print("Pressed STOP Button")
         
+        # Pressed a keyboard key
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 pressedSpaceBar = True
@@ -179,6 +183,7 @@ def pygame_mainloop():
     pygame.draw.ellipse(window, white, Elipse_cloud_4)
     pygame.draw.ellipse(window, white, Elipse_cloud_5)
 
+    # Draw buttons
     window.blit(Button_Start_Text,Button_Start_Text_Rect)
     window.blit(Button_Stop_Text,Button_Stop_Text_Rect)
     window.blit(Tractor, Tractor_rect)
@@ -206,30 +211,29 @@ async def main():
             global past_time_running, timeElapsedText, timeElapsedTextRect
 
             if (message == 'BLACK TAPE'):
-                #global numTapes
+                # Increment Counter
                 numTapes += 1
 
-                #global numBlackTapesText, numBlackTapesTextRect
+                # Update Dynamic Text
                 numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
                 numBlackTapesTextRect = numBlackTapesText.get_rect()
                 numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
 
             if (message == 'Ready to use!'):
-                #global numTapes, past_time_running
+                # Reset Parameters on Arduino Reset
                 numTapes = 0
                 past_time_running = 0
 
-                #global numBlackTapesText, numBlackTapesTextRect
+                # Update Dynamic Text
                 numBlackTapesText = smallfont.render(f"Black Tapes: {numTapes}", True, black, white)
                 numBlackTapesTextRect = numBlackTapesText.get_rect()
                 numBlackTapesTextRect.center = (200 + WINDOW_WIDTH // 2, 45 + WINDOW_HEIGHT // 2)
 
-                #global timeElapsedText, timeElapsedTextRect
                 timeElapsedText = smallfont.render(f"Total Time Driven: {formatted_time_string()}", True, black, white)
                 timeElapsedTextRect = timeElapsedText.get_rect()
                 timeElapsedTextRect.center = (200 + WINDOW_WIDTH // 2, 75 + WINDOW_HEIGHT // 3)
 
-
+        # Enable Receive Data
         await client.start_notify(BLE_UUID, callback)
         
         # Init Pygame
@@ -275,12 +279,12 @@ async def main():
             # Stop running if the BLE is disconnected
             if (not client.is_connected):
                 running = False
-                #print("DISCONNECTED")
+
+            # Only Update Clock when it is ON
             if (ticking):
                 timeElapsedText = smallfont.render(f"Total Time Driven: {formatted_time_string()}", True, black, white)
                 timeElapsedTextRect = timeElapsedText.get_rect()
                 timeElapsedTextRect.center = (200 + WINDOW_WIDTH // 2, 75 + WINDOW_HEIGHT // 3)
-                #print(formatted_time_string())
 
             if (pressedStartButton or pressedEnterKey):
                 # Turn ON

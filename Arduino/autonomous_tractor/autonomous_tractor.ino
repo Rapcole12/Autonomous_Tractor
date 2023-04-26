@@ -24,7 +24,7 @@ float angleY = 0;
 float angleZ = 0;
 float toleranceAngle = 1.0;
 int MAX_SPEED = 80; 
-int SLOW_SPEED = 20;  // CHANGED FROM 100 to 50
+int SLOW_SPEED = 20;
 int STOP_SPEED = 0;
 long duration; 
 int distance; 
@@ -64,6 +64,7 @@ String message = ""; //this will be the actual message that will determine wehth
 // Is the tractor running?
 bool running = false;
 
+// Black Tapes
 int zeroDetect = 0;
 int blackTapeDetect = 0;
 int counter = 0;
@@ -113,6 +114,7 @@ void loop() {
       motorB(STOP, STOP_SPEED);
     } 
 
+    // Generate Ultrasonic Trig
     digitalWrite(TRIG,LOW);
     delayMicroseconds(2);
     digitalWrite(TRIG, HIGH);
